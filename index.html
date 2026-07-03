@@ -462,6 +462,8 @@
 
         function dibujarRuleta() {
             let startAngle = 0;
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas antes de dibujar
+
             for (let i = 0; i < premios.length; i++) {
                 const premio = premios[i];
                 const endAngle = startAngle + premio.weight * arcSize;
@@ -471,21 +473,55 @@
                 ctx.lineTo(250, 250);
                 ctx.fillStyle = premio.color;
                 ctx.fill();
+                ctx.strokeStyle = '#5C3A21'; // Borde para cada segmento
+                ctx.lineWidth = 1; 
+                ctx.stroke();
+
                 ctx.save();
 
                 ctx.translate(250, 250);
-                ctx.rotate(startAngle + premio.weight * arcSize / 2);
+                ctx.rotate(startAngle + premio.weight * arcSize / 2); // Rotar al centro del segmento
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#5C3A21';
-                ctx.font = 'bold 24px Fredoka';
-                ctx.fillText(premio.text, 230, 10);
+                ctx.font = 'bold 20px Fredoka'; // Reducir tamaño de fuente
+                
+                // Ajustar posición del texto para que no se salga
+                const text = premio.text;
+                const maxTextWidth = 200; // Ancho máximo para el texto
+                const textX = 230; // Distancia desde el centro
+
+                // Si el texto es muy largo, ajustarlo o dividirlo
+                if (ctx.measureText(text).width > maxTextWidth) {
+                    let words = text.split(' ');
+                    let line1 = '';
+                    let line2 = '';
+                    for (let j = 0; j < words.length; j++) {
+                        if (ctx.measureText(line1 + words[j]).width < maxTextWidth) {
+                            line1 += words[j] + ' ';
+                        } else {
+                            line2 += words[j] + ' ';
+                        }
+                    }
+                    ctx.fillText(line1.trim(), textX, 0); // Primera línea
+                    if (line2.trim() !== '') {
+                        ctx.fillText(line2.trim(), textX, 25); // Segunda línea, un poco más abajo
+                    }
+                } else {
+                    ctx.fillText(text, textX, 10);
+                }
+                
                 ctx.restore();
 
                 startAngle = endAngle;
             }
         }
 
+        let isSpinning = false;
+
         function girarRuleta() {
+            if (isSpinning) return;
+            isSpinning = true;
+
             const ruletaCanvas = document.getElementById('ruletaCanvas');
             const btnGirar = document.querySelector('.btn-girar');
             const resultadoRuleta = document.getElementById('resultadoRuleta');
@@ -496,21 +532,49 @@
             const randomIndex = seleccionarPremioPorPeso();
             const selectedPremio = premios[randomIndex];
 
+            // Calcular el ángulo de rotación para que el premio seleccionado quede en el indicador
+            // El indicador está en la parte superior (0 grados o 360 grados)
+            // Los premios se dibujan en sentido horario desde el ángulo 0 (derecha)
+            // Necesitamos que el centro del segmento del premio quede en la parte superior
             let spinAngle = 0;
             for (let i = 0; i < randomIndex; i++) {
                 spinAngle += premios[i].weight * arcSize;
             }
-            spinAngle += selectedPremio.weight * arcSize / 2; 
+            spinAngle += selectedPremio.weight * arcSize / 2; // Centro del segmento
 
-            const degreesToSpin = 360 * 5 + (360 - (spinAngle * 180 / Math.PI)) % 360; 
+            // Ajustar para que el indicador apunte al centro del premio
+            // La ruleta gira en sentido horario, el indicador está en la parte superior (90 grados en un círculo trigonométrico)
+            // Queremos que el centro del premio esté en 270 grados (si 0 es a la derecha)
+            // Para que el indicador apunte al centro del premio, necesitamos que el ángulo final de la ruleta
+            // sea tal que el centro del segmento del premio esté alineado con la parte superior.
+            // El 0 de la ruleta está a la derecha. El indicador está arriba (equivalente a 270 grados en un círculo trigonométrico).
+            // Por lo tanto, necesitamos que el ángulo del centro del premio sea 270 grados (o -90 grados).
+            // El ángulo de inicio del dibujo es 0 (derecha). Los ángulos aumentan en sentido horario.
+            // Si el centro del premio está en `spinAngle` (desde el 0 a la derecha, en sentido horario),
+            // para que quede arriba, la ruleta debe girar `(2 * Math.PI - spinAngle) + (3 * Math.PI * 2)`
+            // o de forma más sencilla, calcular el ángulo necesario para que el centro del segmento quede en la posición del indicador.
+            
+            // El indicador está en la posición de las 12 en punto. El 0 de nuestro canvas está a las 3 en punto.
+            // Para que un segmento apunte a las 12 en punto, su centro debe estar a 270 grados (o -90 grados).
+            // Nuestro `spinAngle` es relativo al 0 (3 en punto) y aumenta en sentido horario.
+            // El ángulo objetivo para el centro del segmento es -Math.PI / 2 (o 270 grados).
+            // La rotación necesaria es (ángulo objetivo - spinAngle).
+            // Añadimos giros completos para que la animación sea visible.
+            const targetAngle = -Math.PI / 2; // Posición de las 12 en punto
+            let rotationNeeded = targetAngle - spinAngle;
+            rotationNeeded = rotationNeeded % (2 * Math.PI); // Normalizar a -2PI a 2PI
+            if (rotationNeeded < 0) rotationNeeded += 2 * Math.PI; // Asegurar que sea positivo
 
-            ruletaCanvas.style.transform = `rotate(${degreesToSpin}deg)`;
+            const finalRotation = (5 * 2 * Math.PI) + rotationNeeded; // 5 giros completos + el ángulo necesario
+
+            ruletaCanvas.style.transform = `rotate(${finalRotation}rad)`;
 
             setTimeout(() => {
                 resultadoRuleta.innerText = `¡Ganaste: ${selectedPremio.text}!`;
                 abrirModalRuleta(selectedPremio.text, selectedPremio.description);
                 btnGirar.disabled = false;
-            }, 4000); 
+                isSpinning = false;
+            }, 4000); // Duración de la animación CSS
         }
 
         function seleccionarPremioPorPeso() {
