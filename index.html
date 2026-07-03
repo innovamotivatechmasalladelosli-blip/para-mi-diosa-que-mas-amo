@@ -238,12 +238,13 @@
         }
 
         #ruletaCanvas {
-            width: 280px;
-            height: 280px;
+            width: 320px;
+            height: 320px;
             border: 5px solid #FFD700;
             border-radius: 50%;
             box-shadow: 0 10px 20px rgba(0,0,0,0.15);
             transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            display: block;
         }
 
         .ruleta-indicador {
@@ -443,6 +444,11 @@
         // 4. Lógica de la Ruleta
         const canvas = document.getElementById('ruletaCanvas');
         const ctx = canvas.getContext('2d');
+        
+        // Ajustar el tamaño del canvas para mejor resolución
+        canvas.width = 500;
+        canvas.height = 500;
+        
         const premios = [
             { text: 'Nada 😔', weight: 40, color: '#CCCCCC', description: '¡Ups! No hay bono esta vez, pero siempre hay amor.' },
             { text: 'Dulce 🍬', weight: 20, color: '#FFB347', description: '¡Un dulce para endulzar tu día!' },
@@ -532,40 +538,27 @@
             const randomIndex = seleccionarPremioPorPeso();
             const selectedPremio = premios[randomIndex];
 
-            // Calcular el ángulo de rotación para que el premio seleccionado quede en el indicador
-            // El indicador está en la parte superior (0 grados o 360 grados)
-            // Los premios se dibujan en sentido horario desde el ángulo 0 (derecha)
-            // Necesitamos que el centro del segmento del premio quede en la parte superior
-            let spinAngle = 0;
+            // Calcular el ángulo del centro del segmento seleccionado
+            let segmentAngle = 0;
             for (let i = 0; i < randomIndex; i++) {
-                spinAngle += premios[i].weight * arcSize;
+                segmentAngle += premios[i].weight * arcSize;
             }
-            spinAngle += selectedPremio.weight * arcSize / 2; // Centro del segmento
+            segmentAngle += selectedPremio.weight * arcSize / 2; // Centro del segmento
 
-            // Ajustar para que el indicador apunte al centro del premio
-            // La ruleta gira en sentido horario, el indicador está en la parte superior (90 grados en un círculo trigonométrico)
-            // Queremos que el centro del premio esté en 270 grados (si 0 es a la derecha)
-            // Para que el indicador apunte al centro del premio, necesitamos que el ángulo final de la ruleta
-            // sea tal que el centro del segmento del premio esté alineado con la parte superior.
-            // El 0 de la ruleta está a la derecha. El indicador está arriba (equivalente a 270 grados en un círculo trigonométrico).
-            // Por lo tanto, necesitamos que el ángulo del centro del premio sea 270 grados (o -90 grados).
-            // El ángulo de inicio del dibujo es 0 (derecha). Los ángulos aumentan en sentido horario.
-            // Si el centro del premio está en `spinAngle` (desde el 0 a la derecha, en sentido horario),
-            // para que quede arriba, la ruleta debe girar `(2 * Math.PI - spinAngle) + (3 * Math.PI * 2)`
-            // o de forma más sencilla, calcular el ángulo necesario para que el centro del segmento quede en la posición del indicador.
+            // El indicador está en la parte superior (arriba del canvas)
+            // El 0 radianes en canvas está a la derecha (3 en punto)
+            // Necesitamos rotar para que el segmento esté en la parte superior
+            // La parte superior corresponde a -Math.PI / 2 radianes (o 3π/2)
+            // Entonces la rotación debe ser: (3π/2 - segmentAngle) + giros completos
             
-            // El indicador está en la posición de las 12 en punto. El 0 de nuestro canvas está a las 3 en punto.
-            // Para que un segmento apunte a las 12 en punto, su centro debe estar a 270 grados (o -90 grados).
-            // Nuestro `spinAngle` es relativo al 0 (3 en punto) y aumenta en sentido horario.
-            // El ángulo objetivo para el centro del segmento es -Math.PI / 2 (o 270 grados).
-            // La rotación necesaria es (ángulo objetivo - spinAngle).
-            // Añadimos giros completos para que la animación sea visible.
-            const targetAngle = -Math.PI / 2; // Posición de las 12 en punto
-            let rotationNeeded = targetAngle - spinAngle;
-            rotationNeeded = rotationNeeded % (2 * Math.PI); // Normalizar a -2PI a 2PI
-            if (rotationNeeded < 0) rotationNeeded += 2 * Math.PI; // Asegurar que sea positivo
-
-            const finalRotation = (5 * 2 * Math.PI) + rotationNeeded; // 5 giros completos + el ángulo necesario
+            let rotationAngle = (3 * Math.PI / 2) - segmentAngle;
+            
+            // Normalizar el ángulo a un rango positivo
+            rotationAngle = rotationAngle % (2 * Math.PI);
+            if (rotationAngle < 0) rotationAngle += 2 * Math.PI;
+            
+            // Agregar 5 giros completos para que la animación sea visible
+            const finalRotation = (5 * 2 * Math.PI) + rotationAngle;
 
             ruletaCanvas.style.transform = `rotate(${finalRotation}rad)`;
 
