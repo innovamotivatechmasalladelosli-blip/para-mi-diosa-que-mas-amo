@@ -232,6 +232,7 @@
 
         .modal-mensaje { border: 4px solid #FF9FB5; }
         .modal-vale { border: 4px solid #FFD700; background: white; }
+        .modal-ruleta { border: 4px solid #4CAF50; background: white; }
 
         .btn-cerrar {
             position: absolute;
@@ -271,6 +272,63 @@
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+
+        /* Estilos de la Ruleta */
+        .ruleta-container {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #ruletaCanvas {
+            width: 280px;
+            height: 280px;
+            border: 5px solid #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .ruleta-indicador {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid #FF4B72;
+            z-index: 10;
+        }
+
+        .btn-girar {
+            background-color: #4CAF50;
+            color: white;
+            border: 4px solid white;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-top: 20px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .btn-girar:active {
+            transform: scale(0.95);
+        }
+
+        #resultadoRuleta {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #FF4B72;
+        }
+
     </style>
 </head>
 <body>
@@ -330,6 +388,15 @@
             </div>
         </div>
 
+        <!-- Sección de la Ruleta -->
+        <h2 class="fuente-titulo titulo-vales">🎡 Gira la Ruleta de Bonos 🎡</h2>
+        <div class="ruleta-container">
+            <canvas id="ruletaCanvas" width="500" height="500"></canvas>
+            <div class="ruleta-indicador"></div>
+            <button class="btn-girar fuente-titulo" onclick="girarRuleta()">¡GIRAR!</button>
+            <p id="resultadoRuleta"></p>
+        </div>
+
         <!-- Botón Principal -->
         <button class="btn-principal fuente-titulo" onclick="abrirMensaje()">
             ✨ Toca para un mensajito ✨
@@ -363,6 +430,19 @@
             <p id="vale-desc" style="margin-bottom: 25px; font-size: 1.05rem; opacity: 0.8;"></p>
             <button class="btn-modal fuente-titulo" style="background-color: #FFD700; color: #5C3A21;" onclick="cerrarModal('modal-vale')">
                 ¡Guardar vale!
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Ruleta Resultado -->
+    <div class="modal-overlay" id="modal-ruleta-resultado">
+        <div class="modal-content modal-ruleta">
+            <button class="btn-cerrar fuente-titulo" onclick="cerrarModal('modal-ruleta-resultado')">×</button>
+            <div style="font-size: 3.5rem; margin-bottom: 15px;">🎁</div>
+            <h2 class="fuente-titulo" id="ruleta-resultado-titulo" style="font-size: 1.5rem; margin-bottom: 10px; color: #5C3A21;"></h2>
+            <p id="ruleta-resultado-desc" style="margin-bottom: 25px; font-size: 1.05rem; opacity: 0.8;"></p>
+            <button class="btn-modal fuente-titulo" style="background-color: #4CAF50;" onclick="cerrarModal('modal-ruleta-resultado')">
+                ¡Entendido!
             </button>
         </div>
     </div>
@@ -446,6 +526,105 @@
         function cerrarModal(idModal) {
             document.getElementById(idModal).classList.remove('activo');
         }
+
+        // 4. Lógica de la Ruleta
+        const canvas = document.getElementById('ruletaCanvas');
+        const ctx = canvas.getContext('2d');
+        const premios = [
+            { text: 'Nada 😔', weight: 40, color: '#CCCCCC', description: '¡Ups! No hay bono esta vez, pero siempre hay amor.' },
+            { text: 'Dulce 🍬', weight: 20, color: '#FFB347', description: '¡Un dulce para endulzar tu día!' },
+            { text: 'Verdad o Reto 🤔', weight: 15, color: '#87CEEB', description: '¡Es hora de la diversión! ¿Verdad o Reto?' },
+            { text: 'Foto 📸', weight: 10, color: '#FFD700', description: '¡Una foto juntos para el recuerdo!' },
+            { text: 'Abrazo 🤗', weight: 5, color: '#FF9FB5', description: '¡Un cálido abrazo para ti!' },
+            { text: 'Agarrarse la mano 🤝', weight: 5, color: '#90EE90', description: '¡Un paseo tomados de la mano!' },
+            { text: 'Algo Libre ✨', weight: 5, color: '#DDA0DD', description: '¡Pide lo que quieras, mi amor!' }
+        ];
+
+        const totalWeight = premios.reduce((sum, premio) => sum + premio.weight, 0);
+        const arcSize = 2 * Math.PI / totalWeight;
+
+        function dibujarRuleta() {
+            let startAngle = 0;
+            for (let i = 0; i < premios.length; i++) {
+                const premio = premios[i];
+                const endAngle = startAngle + premio.weight * arcSize;
+
+                ctx.beginPath();
+                ctx.arc(250, 250, 250, startAngle, endAngle);
+                ctx.lineTo(250, 250);
+                ctx.fillStyle = premio.color;
+                ctx.fill();
+                ctx.save();
+
+                ctx.translate(250, 250);
+                ctx.rotate(startAngle + premio.weight * arcSize / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#5C3A21';
+                ctx.font = 'bold 24px Fredoka';
+                ctx.fillText(premio.text, 230, 10);
+                ctx.restore();
+
+                startAngle = endAngle;
+            }
+        }
+
+        function girarRuleta() {
+            const ruletaCanvas = document.getElementById('ruletaCanvas');
+            const btnGirar = document.querySelector('.btn-girar');
+            const resultadoRuleta = document.getElementById('resultadoRuleta');
+
+            btnGirar.disabled = true;
+            resultadoRuleta.innerText = 'Girando...';
+
+            const randomIndex = seleccionarPremioPorPeso();
+            const selectedPremio = premios[randomIndex];
+
+            // Calcular el ángulo de rotación para que el premio seleccionado quede en el indicador
+            // El indicador está en la parte superior (0 grados o 360 grados)
+            // Los premios se dibujan en sentido horario desde el ángulo 0 (derecha)
+            // Necesitamos que el centro del segmento del premio quede en la parte superior
+            let spinAngle = 0;
+            for (let i = 0; i < randomIndex; i++) {
+                spinAngle += premios[i].weight * arcSize;
+            }
+            spinAngle += selectedPremio.weight * arcSize / 2; // Centro del segmento
+
+            // Ajustar para que el indicador apunte al centro del premio
+            // La ruleta gira en sentido horario, el indicador está en la parte superior (90 grados en un círculo trigonométrico)
+            // Queremos que el centro del premio esté en 270 grados (si 0 es a la derecha)
+            const degreesToSpin = 360 * 5 + (360 - (spinAngle * 180 / Math.PI)) % 360; // 5 giros completos + ajuste
+
+            ruletaCanvas.style.transform = `rotate(${degreesToSpin}deg)`;
+
+            setTimeout(() => {
+                resultadoRuleta.innerText = `¡Ganaste: ${selectedPremio.text}!`;
+                abrirModalRuleta(selectedPremio.text, selectedPremio.description);
+                btnGirar.disabled = false;
+                // Resetear la rotación para el siguiente giro (opcional, o dejarla como está)
+                // ruletaCanvas.style.transform = 'rotate(0deg)'; 
+            }, 4000); // Duración de la animación CSS
+        }
+
+        function seleccionarPremioPorPeso() {
+            let random = Math.random() * totalWeight;
+            let currentWeight = 0;
+            for (let i = 0; i < premios.length; i++) {
+                currentWeight += premios[i].weight;
+                if (random < currentWeight) {
+                    return i;
+                }
+            }
+            return 0; // Fallback, debería ser inalcanzable
+        }
+
+        function abrirModalRuleta(titulo, descripcion) {
+            document.getElementById('ruleta-resultado-titulo').innerText = titulo;
+            document.getElementById('ruleta-resultado-desc').innerText = descripcion;
+            document.getElementById('modal-ruleta-resultado').classList.add('activo');
+            if(navigator.vibrate) navigator.vibrate([50, 30, 50]); 
+        }
+
+        dibujarRuleta();
     </script>
 </body>
 </html>
