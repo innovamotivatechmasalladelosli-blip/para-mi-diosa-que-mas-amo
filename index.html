@@ -389,7 +389,7 @@
 
         /* Animación de giro físico */
         .ruleta-wrapper.girando {
-            transition: none !important;
+            /* Dejamos que JS controle la transición */
         }
 
         /* Efecto de despliegue */
@@ -780,6 +780,7 @@
         let velocidadY = 0;
         let lastY = 0, lastTime = 0;
         let currentRotation = 0;
+        let totalRotationApplied = 0;
         let isSpinning = false;
 
         const barraFuerzaContainer = document.getElementById('barraFuerzaContainer');
@@ -944,53 +945,75 @@
             segmentAngle += selectedPremio.weight * arcSize / 2;
             
             // Convertir a grados y orientar al indicador (arriba)
+            // En Canvas, 0 rad es a las 3 en punto (derecha). El indicador está a las 12 (-90 grados).
             let segmentDeg = (segmentAngle * 180 / Math.PI);
-            let targetDeg = 360 - (segmentDeg % 360) - 90;
-            if (targetDeg < 0) targetDeg += 360;
             
-            // Duración basada en fuerza (2-5 segundos)
+            // La ruleta gira en sentido horario (positivo).
+            // Para que el segmento llegue al tope (-90 grados):
+            // (Posicion_Final) = (Posicion_Inicial + Rotacion) % 360
+            // -90 = (segmentDeg + Rotacion) % 360
+            // Rotacion = -90 - segmentDeg
+            let rotationNeeded = -90 - segmentDeg;
+            
+            // Duración basada en fuerza (3-4 segundos para mayor fluidez)
             const fuerzaNorm = Math.min(fuerza, 5000);
-            const duracion = 2000 + (fuerzaNorm / 5000) * 3000;
+            const duracion = 3000 + (fuerzaNorm / 5000) * 1000;
             
-            // Giros completos basados en fuerza (3-8 giros)
-            const giros = Math.floor(3 + (fuerzaNorm / 5000) * 5);
-            const rotacionTotal = (giros * 360) + targetDeg;
+            // Giros completos basados en fuerza (5-10 giros)
+            const giros = Math.floor(5 + (fuerzaNorm / 5000) * 5);
+            
+            // Calculamos la rotación total positiva
+            // Ajustamos rotationNeeded para que sea el complemento positivo si es necesario
+            let finalRotationOffset = rotationNeeded;
+            while (finalRotationOffset < 0) finalRotationOffset += 360;
+            
+            const rotacionTotal = (giros * 360) + finalRotationOffset;
             
             // Resetear y aplicar animación
             ruletaWrapper.classList.remove('anim-desplegar');
-            ruletaWrapper.style.transition = 'none';
-            ruletaWrapper.style.transform = 'scale(1.15) rotate(0deg)';
-            void ruletaWrapper.offsetWidth;
             
-            ruletaWrapper.style.transition = `transform ${duracion}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
-            ruletaWrapper.style.transform = `scale(1.15) rotate(${rotacionTotal}deg)`;
+            // Calculamos desde dónde estamos actualmente (normalizado)
+            const currentNorm = totalRotationApplied;
+            
+            // La rotación total debe ser incremental para que no retroceda
+            const newRotationTotal = currentNorm + (giros * 360) + (finalRotationOffset - (currentNorm % 360) + 360) % 360;
+            totalRotationApplied = newRotationTotal;
+
+            // Usamos una curva de salida más suave (ease-out)
+            ruletaWrapper.style.transition = `transform ${duracion}ms cubic-bezier(0.15, 0, 0.15, 1)`;
+            ruletaWrapper.style.transform = `scale(1.15) rotate(${newRotationTotal}deg)`;
             
             resultadoRuleta.innerText = 'Girando...';
             
             setTimeout(() => {
                 resultadoRuleta.innerText = `¡Ganaste: ${selectedPremio.text}!`;
-                abrirModalRuleta(selectedPremio.text, selectedPremio.description);
                 
-                ruletaWrapper.classList.remove('girando');
-                ruletaWrapper.style.transition = 'transform 0.5s cubic-bezier(0.36, 0, 0.66, -0.56)';
-                ruletaWrapper.classList.add('anim-recoger');
-                
+                // Pequeña pausa antes de mostrar el modal para que se aprecie el resultado
                 setTimeout(() => {
-                    ruletaWrapper.style.transform = 'scale(0.92) rotate(0deg)';
-                    ruletaWrapper.classList.remove('anim-recoger');
-                    ruletaWrapper.classList.add('compacta');
+                    abrirModalRuleta(selectedPremio.text, selectedPremio.description);
+                    
+                    ruletaWrapper.classList.remove('girando');
+                    // Suavizamos la transición de vuelta
+                    ruletaWrapper.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    ruletaWrapper.classList.add('anim-recoger');
                     
                     setTimeout(() => {
-                        ruletaWrapper.style.transition = '';
-                        isSpinning = false;
-                        currentRotation = 0;
-                        fuerzaAcumulada = 0;
+                        // Mantenemos la rotación final acumulada para evitar saltos
+                        ruletaWrapper.style.transform = `scale(0.92) rotate(${totalRotationApplied}deg)`;
+                        ruletaWrapper.classList.remove('anim-recoger');
+                        ruletaWrapper.classList.add('compacta');
                         
-                        if (tirosRestantes > 0 && tiempoRestanteMs > 0) {
-                            instruccionGiro.style.opacity = '1';
-                        }
-                    }, 500);
-                }, 500);
+                        setTimeout(() => {
+                            isSpinning = false;
+                            currentRotation = totalRotationApplied % 360;
+                            fuerzaAcumulada = 0;
+                            
+                            if (tirosRestantes > 0 && tiempoRestanteMs > 0) {
+                                instruccionGiro.style.opacity = '1';
+                            }
+                        }, 800);
+                    }, 600);
+                }, 400);
             }, duracion);
         }
 
