@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para mi Niña Hermosa 💛</title>
+    
+    <!-- Fuentes bonitas de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Configuraciones generales */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #FFFDF5;
+            color: #5C3A21;
+            font-family: 'Nunito', sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* Tipografía para títulos */
+        h1, h2, h3, .fuente-titulo {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .contenedor {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px 20px 20px 20px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            color: #5C3A21;
+        }
+
+        .subtitulo {
+            font-size: 1.1rem;
+            color: rgba(92, 58, 33, 0.8);
+            margin-bottom: 30px;
+        }
+
+        /* Dibujo animado de Pompompurin */
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .dibujo-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px auto;
+            animation: flotar 3.5s ease-in-out infinite;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .brillo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 90%;
+            background-color: rgba(255, 215, 0, 0.25);
+            border-radius: 50%;
+            filter: blur(25px);
+            z-index: 1;
+        }
+
+        .dibujo-svg {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
+        }
+
+        .instruccion {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(92, 58, 33, 0.5);
+            margin-top: 10px;
+            font-weight: 700;
+        }
+
+        /* Cuadrícula de Vales */
+        .titulo-vales {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .vales-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .vale {
+            background: white;
+            padding: 15px 10px;
+            border-radius: 20px;
+            border: 2px dashed #FFD700;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .vale:active { transform: scale(0.95); }
+        .vale.rosa { border-color: #FF9FB5; }
+        .vale.cafe { border-color: #5C3A21; }
+        .vale.naranja { border-color: #FFB347; }
+
+        .vale-icono {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        .vale h3 {
+            font-size: 0.95rem;
+            color: #5C3A21;
+        }
+
+        /* Botón Principal (El Mensaje) */
+        @keyframes latido {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .btn-principal {
+            background-color: #FF4B72;
+            color: white;
+            border: 4px solid white;
+            padding: 16px 25px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(255, 75, 114, 0.4);
+            animation: latido 2s infinite;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .btn-principal:active {
+            transform: scale(0.96);
+            animation: none;
+        }
+
+        /* Animación de Lluvia de Emojis */
+        .gota {
+            position: fixed;
+            top: -50px;
+            z-index: 1;
+            user-select: none;
+            pointer-events: none;
+            animation: caer linear forwards;
+        }
+
+        @keyframes caer {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        /* Modales (Ventanas Emergentes) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(92, 58, 33, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.activo {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: #FFFDF5;
+            width: 100%;
+            max-width: 340px;
+            padding: 35px 25px;
+            border-radius: 30px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .modal-overlay.activo .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-mensaje { border: 4px solid #FF9FB5; }
+        .modal-vale { border: 4px solid #FFD700; background: white; }
+
+        .btn-cerrar {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #5C3A21;
+            opacity: 0.4;
+            cursor: pointer;
+        }
+
+        /* Textos del Mensaje Hermoso */
+        .frase-principal {
+            font-size: 1.8rem;
+            color: #FF4B72;
+            margin: 15px 0;
+            line-height: 1.2;
+        }
+
+        .frase-secundaria {
+            font-size: 1.1rem;
+            font-style: italic;
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .btn-modal {
+            color: white;
+            border: none;
+            padding: 14px 0;
+            width: 100%;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor">
+        
+        <h1 class="fuente-titulo">¡Hola, mi amor! 💛</h1>
+        <p class="subtitulo">Te preparé una pequeña sorpresa...</p>
+
+        <!-- Pompompurin interactivo -->
+        <div class="dibujo-container" onclick="crearDestellos(event)">
+            <div class="brillo"></div>
+            <!-- SVG de Pompompurin dibujado con código -->
+            <svg class="dibujo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cuerpo -->
+                <rect x="50" y="55" width="100" height="105" rx="45" fill="#FFD700" />
+                <!-- Orejas -->
+                <ellipse cx="45" cy="95" rx="14" ry="32" fill="#FFD700" transform="rotate(22 45 95)" />
+                <ellipse cx="155" cy="95" rx="14" ry="32" fill="#FFD700" transform="rotate(-22 155 95)" />
+                <!-- Boina -->
+                <ellipse cx="100" cy="45" rx="35" ry="12" fill="#5C3A21" />
+                <circle cx="100" cy="35" r="8" fill="#5C3A21" />
+                <!-- Cara -->
+                <circle cx="80" cy="100" r="5.5" fill="#5C3A21" />
+                <circle cx="120" cy="100" r="5.5" fill="#5C3A21" />
+                <ellipse cx="65" cy="110" rx="9" ry="4" fill="#FF9FB5" opacity="0.7" />
+                <ellipse cx="135" cy="110" rx="9" ry="4" fill="#FF9FB5" opacity="0.7" />
+                <circle cx="100" cy="105" r="3" fill="#5C3A21" />
+                <path d="M 90 112 Q 95 118 100 112 Q 105 118 110 112" fill="none" stroke="#5C3A21" stroke-width="3" stroke-linecap="round" />
+                <!-- Corazón -->
+                <path d="M 100 145 C 100 145 85 130 85 120 C 85 110 105 110 100 125 C 95 110 115 110 115 120 C 115 130 100 145 100 145 Z" fill="#FF4B72" transform="scale(1.8) translate(-45, -55)"/>
+                <!-- Patitas -->
+                <ellipse cx="80" cy="135" rx="10" ry="7" fill="#FFD700" transform="rotate(-25 80 135)" />
+                <ellipse cx="120" cy="135" rx="10" ry="7" fill="#FFD700" transform="rotate(25 120 135)" />
+            </svg>
+            <p class="instruccion">Tócale la pancita 👆</p>
+        </div>
+
+        <!-- Sección de Vales -->
+        <h2 class="fuente-titulo titulo-vales">🍮 Tus Vales Especiales 🍮</h2>
+        <div class="vales-grid">
+            <div class="vale" onclick="abrirVale('¡Vale por un besote!', 'Te lo doy apenas te vea 😘')">
+                <span class="vale-icono">💋</span>
+                <h3 class="fuente-titulo">Vale por un Beso</h3>
+            </div>
+            <div class="vale rosa" onclick="abrirVale('¡Cita de postres!', 'Yo invito, tú eliges el lugar 🍰🍮')">
+                <span class="vale-icono">🍰</span>
+                <h3 class="fuente-titulo">Cita de Postres</h3>
+            </div>
+            <div class="vale cafe" onclick="abrirVale('¡Tarde de pelis!', 'Preparo palomitas y tu manta favorita 🍿🎬')">
+                <span class="vale-icono">🎬</span>
+                <h3 class="fuente-titulo">Tarde de Pelis</h3>
+            </div>
+            <div class="vale naranja" onclick="abrirVale('¡Vale de la razón!', 'Por esta vez, tú tienes la razón en todo 😂💛')">
+                <span class="vale-icono">👑</span>
+                <h3 class="fuente-titulo">Vale de la Razón</h3>
+            </div>
+        </div>
+
+        <!-- Botón Principal -->
+        <button class="btn-principal fuente-titulo" onclick="abrirMensaje()">
+            ✨ Toca para un mensajito ✨
+        </button>
+
+    </div>
+
+    <!-- Modal del Mensaje -->
+    <div class="modal-overlay" id="modal-mensaje">
+        <div class="modal-content modal-mensaje">
+            <button class="btn-cerrar fuente-titulo" onclick="cerrarModal('modal-mensaje')">×</button>
+            <div style="font-size: 3.5rem; margin-bottom: 10px; animation: flotar 2s infinite;">💖</div>
+            
+            <h2 class="fuente-titulo frase-principal">Te amou amour muchio 💛</h2>
+            <p class="frase-secundaria">
+                "Eres perfecta, maravillosa y la persona más increíble que hace de mis días los mejores de toda mi vida."
+            </p>
+            
+            <button class="btn-modal fuente-titulo" style="background-color: #FF9FB5;" onclick="cerrarModal('modal-mensaje')">
+                Yo también te amo ✨
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Vales -->
+    <div class="modal-overlay" id="modal-vale">
+        <div class="modal-content modal-vale">
+            <button class="btn-cerrar fuente-titulo" onclick="cerrarModal('modal-vale')">×</button>
+            <div style="font-size: 3.5rem; margin-bottom: 15px;">🎉</div>
+            <h2 class="fuente-titulo" id="vale-titulo" style="font-size: 1.5rem; margin-bottom: 10px; color: #5C3A21;"></h2>
+            <p id="vale-desc" style="margin-bottom: 25px; font-size: 1.05rem; opacity: 0.8;"></p>
+            <button class="btn-modal fuente-titulo" style="background-color: #FFD700; color: #5C3A21;" onclick="cerrarModal('modal-vale')">
+                ¡Guardar vale!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Lluvia de Emojis de fondo
+        const emojis = ['💛', '🍮', '✨'];
+        
+        function iniciarLluvia() {
+            setInterval(() => {
+                const gota = document.createElement('div');
+                gota.classList.add('gota');
+                gota.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                // Posición y tamaño aleatorios
+                gota.style.left = Math.random() * 95 + 'vw';
+                gota.style.fontSize = (Math.random() * 12 + 14) + 'px'; // Entre 14px y 26px
+                gota.style.opacity = Math.random() * 0.5 + 0.2;
+                
+                // Duración de la caída
+                const duracion = Math.random() * 4 + 4; 
+                gota.style.animationDuration = duracion + 's';
+                
+                document.body.appendChild(gota);
+                
+                // Eliminar cuando termine la animación
+                setTimeout(() => gota.remove(), duracion * 1000);
+            }, 700); // Cae un elemento cada 700ms
+        }
+        
+        // Arrancar lluvia
+        window.onload = iniciarLluvia;
+
+        // 2. Destellos al tocar a Pompompurin
+        function crearDestellos(e) {
+            // Intentar vibrar el celular
+            if(navigator.vibrate) navigator.vibrate(40);
+            
+            for(let i = 0; i < 6; i++) {
+                const estrella = document.createElement('div');
+                estrella.innerHTML = '✨';
+                estrella.style.position = 'fixed';
+                
+                // Obtener coordenadas del toque (ratón o dedo)
+                const x = e.clientX || (e.touches && e.touches[0].clientX);
+                const y = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                estrella.style.left = x + 'px';
+                estrella.style.top = y + 'px';
+                estrella.style.fontSize = '22px';
+                estrella.style.pointerEvents = 'none';
+                estrella.style.transition = 'all 0.6s ease-out';
+                
+                document.body.appendChild(estrella);
+                
+                // Animación de dispersión en círculo
+                setTimeout(() => {
+                    const angulo = (i / 6) * Math.PI * 2;
+                    const distancia = 70;
+                    estrella.style.transform = `translate(${Math.cos(angulo)*distancia}px, ${Math.sin(angulo)*distancia}px) scale(1.5)`;
+                    estrella.style.opacity = '0';
+                }, 10);
+                
+                setTimeout(() => estrella.remove(), 600);
+            }
+        }
+
+        // 3. Control de ventanas emergentes (Modales)
+        function abrirMensaje() {
+            document.getElementById('modal-mensaje').classList.add('activo');
+            if(navigator.vibrate) navigator.vibrate([30, 50, 30]); 
+        }
+
+        function abrirVale(titulo, desc) {
+            document.getElementById('vale-titulo').innerText = titulo;
+            document.getElementById('vale-desc').innerText = desc;
+            document.getElementById('modal-vale').classList.add('activo');
+            if(navigator.vibrate) navigator.vibrate(30);
+        }
+
+        function cerrarModal(idModal) {
+            document.getElementById(idModal).classList.remove('activo');
+        }
+    </script>
+</body>
+</html>
