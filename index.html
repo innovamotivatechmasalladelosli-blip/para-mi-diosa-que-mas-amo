@@ -31,7 +31,6 @@
             padding-bottom: 50px;
         }
 
-        /* Tipografía para títulos */
         h1, h2, h3, .fuente-titulo {
             font-family: 'Fredoka', sans-serif;
         }
@@ -56,7 +55,7 @@
             margin-bottom: 30px;
         }
 
-        /* Dibujo animado de Pompompurin */
+        /* Pompompurin */
         @keyframes flotar {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-12px); }
@@ -101,7 +100,7 @@
             font-weight: 700;
         }
 
-        /* Botón Principal (El Mensaje) */
+        /* Botón Principal */
         @keyframes latido {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -130,7 +129,7 @@
             animation: none;
         }
 
-        /* Animación de Lluvia de Emojis */
+        /* Lluvia de Emojis */
         .gota {
             position: fixed;
             top: -50px;
@@ -144,7 +143,7 @@
             to { transform: translateY(110vh) rotate(360deg); }
         }
 
-        /* Modales (Ventanas Emergentes) */
+        /* Modales */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -200,7 +199,6 @@
             cursor: pointer;
         }
 
-        /* Textos del Mensaje Hermoso */
         .frase-principal {
             font-size: 1.8rem;
             color: #FF4B72;
@@ -241,52 +239,113 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         }
 
+        /* Wrapper de la ruleta - tamaño fijo basado en canvas */
+        .ruleta-wrapper {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s;
+        }
+
+        .ruleta-wrapper.desplegada {
+            transform: scale(1.15) rotate(0deg);
+        }
+
+        /* Estado inicial compacto pero VISIBLE */
+        .ruleta-wrapper.compacta {
+            transform: scale(0.92);
+        }
+
         #ruletaCanvas {
-            width: 320px;
-            height: 320px;
+            width: 280px;
+            height: 280px;
             border: 8px solid #FFD700;
             border-radius: 50%;
             box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
             display: block;
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.05) 100%);
-            transform-origin: center;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #ruletaCanvas:active {
+            cursor: grabbing;
         }
 
         .ruleta-indicador {
             position: absolute;
-            top: -20px;
+            top: -18px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 25px solid #FFD700;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 22px solid #FFD700;
             z-index: 10;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
-        .btn-girar {
-            background-color: #FFD700;
-            color: #5C3A21;
-            border: 4px solid white;
-            padding: 12px 20px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-            margin-top: 20px;
-            transition: background-color 0.3s, transform 0.1s;
-            font-weight: bold;
+        .ruleta-centro {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 42px;
+            height: 42px;
+            background: radial-gradient(circle, #FFD700 0%, #DAA520 100%);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 11;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            pointer-events: none;
         }
 
-        .btn-girar:active {
-            transform: scale(0.95);
+        /* Indicadores de tiro y tiempo */
+        .ruleta-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 280px;
+            margin-top: 15px;
+            gap: 12px;
         }
-        
-        .btn-girar:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+
+        .info-bloque {
+            flex: 1;
+            background: rgba(255, 215, 0, 0.15);
+            border-radius: 15px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .info-bloque .numero {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #5C3A21;
+        }
+
+        .info-bloque .etiqueta {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(92, 58, 33, 0.6);
+            margin-top: 2px;
+        }
+
+        .info-bloque.tiros-agotados .numero {
+            color: #FF4B72;
+        }
+
+        .info-bloque.tiempo-agotado .numero {
+            color: #FF4B72;
         }
 
         #resultadoRuleta {
@@ -294,6 +353,74 @@
             font-size: 1.3rem;
             font-weight: bold;
             color: #FF4B72;
+        }
+
+        /* Barra de fuerza del empujón */
+        .barra-fuerza-container {
+            width: 100%;
+            max-width: 240px;
+            height: 10px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .barra-fuerza-container.visible {
+            opacity: 1;
+        }
+
+        .barra-fuerza {
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #4CAF50 0%, #FFD700 50%, #FF4B72 100%);
+            transition: width 0.05s linear;
+        }
+
+        .instruccion-giro {
+            font-size: 0.8rem;
+            color: rgba(92, 58, 33, 0.6);
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        /* Animación de giro físico */
+        .ruleta-wrapper.girando {
+            transition: none !important;
+        }
+
+        /* Efecto de despliegue */
+        @keyframes desplegar {
+            0% { transform: scale(0.55) rotate(-20deg); }
+            60% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1.15) rotate(0deg); }
+        }
+
+        .ruleta-wrapper.anim-desplegar {
+            animation: desplegar 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Animación de recogida */
+        @keyframes recoger {
+            0% { transform: scale(1.15) rotate(0deg); }
+            100% { transform: scale(0.92) rotate(-10deg); }
+        }
+
+        .ruleta-wrapper.anim-recoger {
+            animation: recoger 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards;
+        }
+
+        /* Pulsación cuando se puede girar */
+        @keyframes pulsarRuleta {
+            0%, 100% { box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1); }
+            50% { box-shadow: 0 10px 40px rgba(255, 215, 0, 0.6), inset 0 0 30px rgba(255, 215, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.3); }
+        }
+
+        .ruleta-wrapper.puede-girar #ruletaCanvas {
+            animation: pulsarRuleta 2s ease-in-out infinite;
         }
 
     </style>
@@ -308,26 +435,19 @@
         <!-- Pompompurin interactivo -->
         <div class="dibujo-container" onclick="crearDestellos(event)">
             <div class="brillo"></div>
-            <!-- SVG de Pompompurin dibujado con código -->
             <svg class="dibujo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <!-- Cuerpo -->
                 <rect x="50" y="55" width="100" height="105" rx="45" fill="#FFD700" />
-                <!-- Orejas -->
                 <ellipse cx="45" cy="95" rx="14" ry="32" fill="#FFD700" transform="rotate(22 45 95)" />
                 <ellipse cx="155" cy="95" rx="14" ry="32" fill="#FFD700" transform="rotate(-22 155 95)" />
-                <!-- Boina -->
                 <ellipse cx="100" cy="45" rx="35" ry="12" fill="#5C3A21" />
                 <circle cx="100" cy="35" r="8" fill="#5C3A21" />
-                <!-- Cara -->
                 <circle cx="80" cy="100" r="5.5" fill="#5C3A21" />
                 <circle cx="120" cy="100" r="5.5" fill="#5C3A21" />
                 <ellipse cx="65" cy="110" rx="9" ry="4" fill="#FF9FB5" opacity="0.7" />
                 <ellipse cx="135" cy="110" rx="9" ry="4" fill="#FF9FB5" opacity="0.7" />
                 <circle cx="100" cy="105" r="3" fill="#5C3A21" />
                 <path d="M 90 112 Q 95 118 100 112 Q 105 118 110 112" fill="none" stroke="#5C3A21" stroke-width="3" stroke-linecap="round" />
-                <!-- Corazón -->
                 <path d="M 100 145 C 100 145 85 130 85 120 C 85 110 105 110 100 125 C 95 110 115 110 115 120 C 115 130 100 145 100 145 Z" fill="#FF4B72" transform="scale(1.8) translate(-45, -55)"/>
-                <!-- Patitas -->
                 <ellipse cx="80" cy="135" rx="10" ry="7" fill="#FFD700" transform="rotate(-25 80 135)" />
                 <ellipse cx="120" cy="135" rx="10" ry="7" fill="#FFD700" transform="rotate(25 120 135)" />
             </svg>
@@ -336,10 +456,31 @@
 
         <!-- Sección de la Ruleta -->
         <h2 class="fuente-titulo titulo-vales" style="color: #FFD700; text-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">🎡 Gira la Ruleta de Bonos 🎡</h2>
+        
+        <div class="ruleta-info">
+            <div class="info-bloque" id="bloqueTiros">
+                <div class="numero" id="numTiros">5</div>
+                <div class="etiqueta">Tiros restantes</div>
+            </div>
+            <div class="info-bloque" id="bloqueTiempo">
+                <div class="numero" id="numTiempo">2:00</div>
+                <div class="etiqueta">Tiempo restante</div>
+            </div>
+        </div>
+
         <div class="ruleta-container">
-            <canvas id="ruletaCanvas" width="500" height="500"></canvas>
-            <div class="ruleta-indicador"></div>
-            <button class="btn-girar fuente-titulo" onclick="girarRuleta()">¡GIRAR!</button>
+            <div class="ruleta-wrapper compacta puede-girar" id="ruletaWrapper">
+                <canvas id="ruletaCanvas" width="500" height="500"></canvas>
+                <div class="ruleta-indicador"></div>
+                <div class="ruleta-centro">🎰</div>
+            </div>
+            
+            <div class="barra-fuerza-container" id="barraFuerzaContainer">
+                <div class="barra-fuerza" id="barraFuerza"></div>
+            </div>
+            
+            <p class="instruccion-giro" id="instruccionGiro">↕ Desliza con fuerza sobre la ruleta para girar</p>
+            
             <p id="resultadoRuleta"></p>
         </div>
 
@@ -381,7 +522,9 @@
     </div>
 
     <script>
-        // 1. Lluvia de Emojis de fondo
+        // ============================================================
+        // 1. Lluvia de Emojis
+        // ============================================================
         const emojis = ['💛', '🍮', '✨'];
         
         function iniciarLluvia() {
@@ -389,75 +532,64 @@
                 const gota = document.createElement('div');
                 gota.classList.add('gota');
                 gota.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-                
-                // Posición y tamaño aleatorios
                 gota.style.left = Math.random() * 95 + 'vw';
-                gota.style.fontSize = (Math.random() * 12 + 14) + 'px'; // Entre 14px y 26px
+                gota.style.fontSize = (Math.random() * 12 + 14) + 'px';
                 gota.style.opacity = Math.random() * 0.5 + 0.2;
-                
-                // Duración de la caída
-                const duracion = Math.random() * 4 + 4; 
+                const duracion = Math.random() * 4 + 4;
                 gota.style.animationDuration = duracion + 's';
-                
                 document.body.appendChild(gota);
-                
-                // Eliminar cuando termine la animación
                 setTimeout(() => gota.remove(), duracion * 1000);
-            }, 700); // Cae un elemento cada 700ms
+            }, 700);
         }
         
-        // Arrancar lluvia
         window.onload = iniciarLluvia;
 
-        // 2. Destellos al tocar a Pompompurin
+        // ============================================================
+        // 2. Destellos Pompompurin
+        // ============================================================
         function crearDestellos(e) {
-            // Intentar vibrar el celular
             if(navigator.vibrate) navigator.vibrate(40);
-            
             for(let i = 0; i < 6; i++) {
                 const estrella = document.createElement('div');
                 estrella.innerHTML = '✨';
                 estrella.style.position = 'fixed';
-                
-                // Obtener coordenadas del toque (ratón o dedo)
                 const x = e.clientX || (e.touches && e.touches[0].clientX);
                 const y = e.clientY || (e.touches && e.touches[0].clientY);
-                
                 estrella.style.left = x + 'px';
                 estrella.style.top = y + 'px';
                 estrella.style.fontSize = '22px';
                 estrella.style.pointerEvents = 'none';
                 estrella.style.transition = 'all 0.6s ease-out';
-                
                 document.body.appendChild(estrella);
-                
-                // Animación de dispersión en círculo
                 setTimeout(() => {
                     const angulo = (i / 6) * Math.PI * 2;
                     const distancia = 70;
                     estrella.style.transform = `translate(${Math.cos(angulo)*distancia}px, ${Math.sin(angulo)*distancia}px) scale(1.5)`;
                     estrella.style.opacity = '0';
                 }, 10);
-                
                 setTimeout(() => estrella.remove(), 600);
             }
         }
 
-        // 3. Control de ventanas emergentes (Modales)
+        // ============================================================
+        // 3. Modales
+        // ============================================================
         function abrirMensaje() {
             document.getElementById('modal-mensaje').classList.add('activo');
-            if(navigator.vibrate) navigator.vibrate([30, 50, 30]); 
+            if(navigator.vibrate) navigator.vibrate([30, 50, 30]);
         }
 
         function cerrarModal(idModal) {
             document.getElementById(idModal).classList.remove('activo');
         }
 
-        // 4. Lógica de la Ruleta
+        // ============================================================
+        // 4. Ruleta - Dibujado
+        // ============================================================
         const canvas = document.getElementById('ruletaCanvas');
         const ctx = canvas.getContext('2d');
+        const ruletaWrapper = document.getElementById('ruletaWrapper');
         
-        // Ajustar el tamaño del canvas para mejor resolución
         canvas.width = 500;
         canvas.height = 500;
         
@@ -475,139 +607,426 @@
             { text: 'Vale de la Razón 👑', weight: 10, color: '#FFECB3', description: '¡Por esta vez, tú tienes la razón en todo! 😉' }
         ];
 
-        const totalWeight = premios.reduce((sum, premio) => sum + premio.weight, 0);
+        const totalWeight = premios.reduce((sum, p) => sum + p.weight, 0);
         const arcSize = 2 * Math.PI / totalWeight;
 
         function dibujarRuleta() {
             let startAngle = 0;
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas antes de dibujar
+            ctx.clearRect(0, 0, 500, 500);
 
             for (let i = 0; i < premios.length; i++) {
-                const premio = premios[i];
-                const endAngle = startAngle + premio.weight * arcSize;
+                const p = premios[i];
+                const endAngle = startAngle + p.weight * arcSize;
 
                 ctx.beginPath();
-                ctx.arc(250, 250, 250, startAngle, endAngle);
-                ctx.lineTo(250, 250);
-                ctx.fillStyle = premio.color;
+                ctx.moveTo(250, 250);
+                ctx.arc(250, 250, 246, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = p.color;
                 ctx.fill();
-                ctx.strokeStyle = '#FFD700'; // Borde dorado para cada segmento
-                ctx.lineWidth = 2; 
+                ctx.strokeStyle = '#DAA520';
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
+                // Texto
                 ctx.save();
-
                 ctx.translate(250, 250);
-                ctx.rotate(startAngle + premio.weight * arcSize / 2); // Rotar al centro del segmento
+                ctx.rotate(startAngle + p.weight * arcSize / 2);
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#5C3A21';
-                ctx.font = 'bold 18px Fredoka'; // Tamaño de fuente optimizado
+                ctx.font = 'bold 17px Fredoka, sans-serif';
                 
-                // Ajustar posición del texto para que no se salga
-                const text = premio.text;
-                const maxTextWidth = 200; // Ancho máximo para el texto
-                const textX = 230; // Distancia desde el centro
-
-                // Si el texto es muy largo, ajustarlo o dividirlo
-                if (ctx.measureText(text).width > maxTextWidth) {
-                    let words = text.split(' ');
-                    let line1 = '';
-                    let line2 = '';
+                const text = p.text;
+                const textX = 225;
+                
+                if (ctx.measureText(text).width > 180) {
+                    const words = text.split(' ');
+                    let line1 = '', line2 = '';
                     for (let j = 0; j < words.length; j++) {
-                        if (ctx.measureText(line1 + words[j]).width < maxTextWidth) {
+                        if (ctx.measureText(line1 + words[j]).width < 180) {
                             line1 += words[j] + ' ';
                         } else {
                             line2 += words[j] + ' ';
                         }
                     }
-                    ctx.fillText(line1.trim(), textX, 0); // Primera línea
-                    if (line2.trim() !== '') {
-                        ctx.fillText(line2.trim(), textX, 25); // Segunda línea, un poco más abajo
-                    }
+                    ctx.fillText(line1.trim(), textX, -8);
+                    if (line2.trim()) ctx.fillText(line2.trim(), textX, 12);
                 } else {
-                    ctx.fillText(text, textX, 10);
+                    ctx.fillText(text, textX, 4);
                 }
-                
                 ctx.restore();
-
                 startAngle = endAngle;
+            }
+
+            // Círculo central (decorativo)
+            ctx.beginPath();
+            ctx.arc(250, 250, 22, 0, 2 * Math.PI);
+            ctx.fillStyle = '#FFD700';
+            ctx.fill();
+            ctx.strokeStyle = '#DAA520';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        dibujarRuleta();
+
+        // ============================================================
+        // 5. Sistema de Tiros y Tiempo
+        // ============================================================
+        const MAX_TIROS = 5;
+        const INTERVALO_TIROS = 2 * 60 * 1000;
+        
+        let tirosRestantes = MAX_TIROS;
+        let tiempoRestanteMs = INTERVALO_TIROS;
+        let ultimoTiroTime = null;
+
+        function cargarEstado() {
+            const guardado = localStorage.getItem('ruleta_state');
+            if (guardado) {
+                try {
+                    const data = JSON.parse(guardado);
+                    const ahora = Date.now();
+                    const tiempoPasado = ahora - (data.ultimoTiroTime || (ahora - INTERVALO_TIROS));
+                    
+                    if (tiempoPasado >= INTERVALO_TIROS) {
+                        tirosRestantes = MAX_TIROS;
+                        tiempoRestanteMs = INTERVALO_TIROS;
+                    } else {
+                        tiempoRestanteMs = INTERVALO_TIROS - tiempoPasado;
+                        if (data.tirosRestantes < MAX_TIROS && tiempoPasado > 0) {
+                            const tirosRecuperados = Math.floor(tiempoPasado / (INTERVALO_TIROS / MAX_TIROS));
+                            tirosRestantes = Math.min(MAX_TIROS, data.tirosRestantes + tirosRecuperados);
+                        } else {
+                            tirosRestantes = data.tirosRestantes !== undefined ? data.tirosRestantes : MAX_TIROS;
+                        }
+                    }
+                } catch(e) {
+                    tirosRestantes = MAX_TIROS;
+                    tiempoRestanteMs = INTERVALO_TIROS;
+                }
             }
         }
 
+        function guardarEstado() {
+            localStorage.setItem('ruleta_state', JSON.stringify({
+                tirosRestantes: tirosRestantes,
+                ultimoTiroTime: ultimoTiroTime || Date.now()
+            }));
+        }
+
+        cargarEstado();
+        ultimoTiroTime = ultimoTiroTime || Date.now();
+
+        function actualizarDisplayTiros() {
+            const elTiros = document.getElementById('numTiros');
+            const elTiempo = document.getElementById('numTiempo');
+            const bloqueTiros = document.getElementById('bloqueTiros');
+            const bloqueTiempo = document.getElementById('bloqueTiempo');
+            
+            elTiros.textContent = tirosRestantes;
+            
+            if (tirosRestantes <= 0) {
+                bloqueTiros.classList.add('tiros-agotados');
+                ruletaWrapper.classList.remove('puede-girar');
+            } else {
+                bloqueTiros.classList.remove('tiros-agotados');
+            }
+            
+            const segundos = Math.ceil(tiempoRestanteMs / 1000);
+            const minutos = Math.floor(segundos / 60);
+            const segundosRest = segundos % 60;
+            elTiempo.textContent = `${minutos}:${segundosRest.toString().padStart(2, '0')}`;
+            
+            if (segundos <= 30 && tiempoRestanteMs > 0) {
+                bloqueTiempo.classList.add('tiempo-agotado');
+            } else {
+                bloqueTiempo.classList.remove('tiempo-agotado');
+            }
+            
+            if (tiempoRestanteMs <= 0) {
+                ruletaWrapper.classList.remove('puede-girar');
+            }
+        }
+
+        let tiempoInterval;
+        function iniciarTiempoInterval() {
+            tiempoInterval = setInterval(() => {
+                if (tiempoRestanteMs > 0) {
+                    tiempoRestanteMs -= 1000;
+                }
+                
+                if (tiempoRestanteMs <= 0 && tirosRestantes < MAX_TIROS) {
+                    tirosRestantes = MAX_TIROS;
+                    tiempoRestanteMs = INTERVALO_TIROS;
+                    ultimoTiroTime = Date.now();
+                }
+                
+                if (tiempoRestanteMs <= 0) tiempoRestanteMs = 0;
+                
+                actualizarDisplayTiros();
+                guardarEstado();
+            }, 1000);
+        }
+
+        iniciarTiempoInterval();
+        actualizarDisplayTiros();
+
+        // ============================================================
+        // 6. Giro Táctil con Física de Empujón
+        // ============================================================
+        let isDragging = false;
+        let startY = 0, startX = 0;
+        let fuerzaAcumulada = 0;
+        let velocidadY = 0;
+        let lastY = 0, lastTime = 0;
+        let currentRotation = 0;
         let isSpinning = false;
 
-        function girarRuleta() {
+        const barraFuerzaContainer = document.getElementById('barraFuerzaContainer');
+        const barraFuerza = document.getElementById('barraFuerza');
+        const instruccionGiro = document.getElementById('instruccionGiro');
+        const resultadoRuleta = document.getElementById('resultadoRuleta');
+
+        function getCoords(e) {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            return { x: e.clientX || 0, y: e.clientY || 0 };
+        }
+
+        function onStart(e) {
             if (isSpinning) return;
+            if (tirosRestantes <= 0 || tiempoRestanteMs <= 0) {
+                resultadoRuleta.textContent = tirosRestantes <= 0 
+                    ? '¡Sin tiros! Espera a recargar ⏳' 
+                    : '¡Tiempo agotado! Espera ⏳';
+                return;
+            }
+
+            e.preventDefault();
+            isDragging = true;
+            const c = getCoords(e);
+            startY = c.y; startX = c.x;
+            lastY = c.y; lastTime = performance.now();
+            velocidadY = 0;
+            fuerzaAcumulada = 0;
+
+            ruletaWrapper.classList.remove('compacta');
+            ruletaWrapper.classList.add('anim-desplegar');
+            barraFuerzaContainer.classList.add('visible');
+            instruccionGiro.style.opacity = '0';
+            
+            if(navigator.vibrate) navigator.vibrate(15);
+        }
+
+        function onMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            const c = getCoords(e);
+            const ahora = performance.now();
+            const dt = ahora - lastTime;
+            
+            if (dt > 0) {
+                const deltaY = c.y - lastY;
+                velocidadY = deltaY / dt * 1000;
+                
+                if (Math.abs(velocidadY) > 100) {
+                    fuerzaAcumulada += Math.abs(velocidadY);
+                }
+            }
+            
+            const dx = c.x - startX;
+            const dy = c.y - startY;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            
+            if (dist > 10) {
+                const ang = Math.atan2(dy, dx) * (180 / Math.PI);
+                currentRotation = ang;
+                ruletaWrapper.style.transform = `scale(1.15) rotate(${currentRotation}deg)`;
+            }
+            
+            lastY = c.y;
+            lastTime = ahora;
+            
+            const pct = Math.min(100, (fuerzaAcumulada / 3000) * 100);
+            barraFuerza.style.width = pct + '%';
+        }
+
+        function onEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const cx = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX) || startX;
+            const cy = (e.changedTouches ? e.changedTouches[0].clientY : e.clientY) || startY;
+            const dx = cx - startX;
+            const dy = cy - startY;
+            const distanciaTotal = Math.sqrt(dx*dx + dy*dy);
+            
+            const fuerzaInstantanea = Math.abs(velocidadY);
+            const fuerzaFinal = (fuerzaInstantanea * 0.3) + (distanciaTotal * 1.5) + (fuerzaAcumulada * 0.1);
+            
+            const premioIndex = seleccionarPremioPorFuerza(fuerzaFinal);
+            
+            tirosRestantes--;
+            ultimoTiroTime = Date.now();
+            
+            ejecutarGiroFisico(premioIndex, fuerzaFinal);
+            
+            barraFuerzaContainer.classList.remove('visible');
+            barraFuerza.style.width = '0%';
+            
+            actualizarDisplayTiros();
+            guardarEstado();
+        }
+
+        // ============================================================
+        // 7. Selección de Premio por Fuerza
+        // ============================================================
+        function seleccionarPremioPorFuerza(fuerza) {
+            const malos = [];
+            const medios = [];
+            const buenos = [];
+            
+            premios.forEach((p, i) => {
+                if (p.text.includes('Nada') || p.weight >= 30) {
+                    malos.push(i);
+                } else if (p.weight >= 15) {
+                    medios.push(i);
+                } else {
+                    buenos.push(i);
+                }
+            });
+            
+            let probMalos, probMedios, probBuenos;
+            
+            if (fuerza < 500) {
+                probMalos = 0.70; probMedios = 0.25; probBuenos = 0.05;
+            } else if (fuerza < 1500) {
+                const t = (fuerza - 500) / 1000;
+                probMalos = 0.70 - 0.40 * t;
+                probMedios = 0.25 + 0.15 * t;
+                probBuenos = 0.05 + 0.25 * t;
+            } else if (fuerza < 3000) {
+                const t = (fuerza - 1500) / 1500;
+                probMalos = 0.30 - 0.20 * t;
+                probMedios = 0.40 - 0.15 * t;
+                probBuenos = 0.30 + 0.35 * t;
+            } else {
+                probMalos = 0.10; probMedios = 0.25; probBuenos = 0.65;
+            }
+            
+            const roll = Math.random();
+            let grupo;
+            
+            if (roll < probMalos) grupo = malos;
+            else if (roll < probMalos + probMedios) grupo = medios;
+            else grupo = buenos;
+            
+            if (!grupo.length) grupo = malos;
+            return grupo[Math.floor(Math.random() * grupo.length)];
+        }
+
+        // ============================================================
+        // 8. Ejecutar Giro Físico (hasta 5 segundos)
+        // ============================================================
+        function ejecutarGiroFisico(premioIndex, fuerza) {
             isSpinning = true;
-
-            const ruletaCanvas = document.getElementById('ruletaCanvas');
-            const btnGirar = document.querySelector('.btn-girar');
-            const resultadoRuleta = document.getElementById('resultadoRuleta');
-
-            btnGirar.disabled = true;
-            resultadoRuleta.innerText = 'Girando...';
-
-            const randomIndex = seleccionarPremioPorPeso();
-            const selectedPremio = premios[randomIndex];
-
-            // Calcular el ángulo del centro del segmento seleccionado
+            ruletaWrapper.classList.add('girando');
+            
+            const selectedPremio = premios[premioIndex];
+            
+            // Calcular ángulo del segmento
             let segmentAngle = 0;
-            for (let i = 0; i < randomIndex; i++) {
+            for (let i = 0; i < premioIndex; i++) {
                 segmentAngle += premios[i].weight * arcSize;
             }
-            segmentAngle += selectedPremio.weight * arcSize / 2; // Centro del segmento
-
-            // El indicador está en la parte superior (arriba del canvas)
-            // El 0 radianes en canvas está a la derecha (3 en punto)
-            // Necesitamos rotar para que el segmento esté en la parte superior
-            // La parte superior corresponde a -Math.PI / 2 radianes (o 3π/2)
-            // Entonces la rotación debe ser: (3π/2 - segmentAngle) + giros completos
+            segmentAngle += selectedPremio.weight * arcSize / 2;
             
-            let rotationAngle = (3 * Math.PI / 2) - segmentAngle;
+            // Convertir a grados y orientar al indicador (arriba)
+            let segmentDeg = (segmentAngle * 180 / Math.PI);
+            let targetDeg = 360 - (segmentDeg % 360) - 90;
+            if (targetDeg < 0) targetDeg += 360;
             
-            // Normalizar el ángulo a un rango positivo
-            rotationAngle = rotationAngle % (2 * Math.PI);
-            if (rotationAngle < 0) rotationAngle += 2 * Math.PI;
+            // Duración basada en fuerza (2-5 segundos)
+            const fuerzaNorm = Math.min(fuerza, 5000);
+            const duracion = 2000 + (fuerzaNorm / 5000) * 3000;
             
-            // Agregar 5 giros completos para que la animación sea visible
-            const finalRotation = (5 * 2 * Math.PI) + rotationAngle;
-
-            ruletaCanvas.style.transform = `rotate(${finalRotation}rad)`;
-
+            // Giros completos basados en fuerza (3-8 giros)
+            const giros = Math.floor(3 + (fuerzaNorm / 5000) * 5);
+            const rotacionTotal = (giros * 360) + targetDeg;
+            
+            // Resetear y aplicar animación
+            ruletaWrapper.classList.remove('anim-desplegar');
+            ruletaWrapper.style.transition = 'none';
+            ruletaWrapper.style.transform = 'scale(1.15) rotate(0deg)';
+            void ruletaWrapper.offsetWidth;
+            
+            ruletaWrapper.style.transition = `transform ${duracion}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
+            ruletaWrapper.style.transform = `scale(1.15) rotate(${rotacionTotal}deg)`;
+            
+            resultadoRuleta.innerText = 'Girando...';
+            
             setTimeout(() => {
                 resultadoRuleta.innerText = `¡Ganaste: ${selectedPremio.text}!`;
                 abrirModalRuleta(selectedPremio.text, selectedPremio.description);
-                btnGirar.disabled = false;
-                isSpinning = false;
-                // Resetear la transformación para el próximo giro
-                ruletaCanvas.style.transition = 'none';
-                ruletaCanvas.style.transform = 'rotate(0deg)';
-                // Forzar reflow para que se aplique el cambio
-                void ruletaCanvas.offsetWidth;
-                ruletaCanvas.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
-            }, 4000); // Duración de la animación CSS
-        }
-
-        function seleccionarPremioPorPeso() {
-            let random = Math.random() * totalWeight;
-            let currentWeight = 0;
-            for (let i = 0; i < premios.length; i++) {
-                currentWeight += premios[i].weight;
-                if (random < currentWeight) {
-                    return i;
-                }
-            }
-            return 0; 
+                
+                ruletaWrapper.classList.remove('girando');
+                ruletaWrapper.style.transition = 'transform 0.5s cubic-bezier(0.36, 0, 0.66, -0.56)';
+                ruletaWrapper.classList.add('anim-recoger');
+                
+                setTimeout(() => {
+                    ruletaWrapper.style.transform = 'scale(0.92) rotate(0deg)';
+                    ruletaWrapper.classList.remove('anim-recoger');
+                    ruletaWrapper.classList.add('compacta');
+                    
+                    setTimeout(() => {
+                        ruletaWrapper.style.transition = '';
+                        isSpinning = false;
+                        currentRotation = 0;
+                        fuerzaAcumulada = 0;
+                        
+                        if (tirosRestantes > 0 && tiempoRestanteMs > 0) {
+                            instruccionGiro.style.opacity = '1';
+                        }
+                    }, 500);
+                }, 500);
+            }, duracion);
         }
 
         function abrirModalRuleta(titulo, descripcion) {
             document.getElementById('ruleta-resultado-titulo').innerText = titulo;
             document.getElementById('ruleta-resultado-desc').innerText = descripcion;
             document.getElementById('modal-ruleta-resultado').classList.add('activo');
-            if(navigator.vibrate) navigator.vibrate([50, 30, 50]); 
+            if(navigator.vibrate) navigator.vibrate([50, 30, 50]);
         }
 
-        dibujarRuleta();
+        // ============================================================
+        // 9. Event Listeners
+        // ============================================================
+        canvas.addEventListener('touchstart', onStart, { passive: false });
+        canvas.addEventListener('touchmove', onMove, { passive: false });
+        canvas.addEventListener('touchend', onEnd, { passive: false });
+        canvas.addEventListener('touchcancel', onEnd, { passive: false });
+        
+        canvas.addEventListener('mousedown', onStart);
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+
+        // ============================================================
+        // Compatibilidad: girar con botón (fuerza aleatoria media-alta)
+        // ============================================================
+        function girarRuleta() {
+            if (isSpinning || tirosRestantes <= 0 || tiempoRestanteMs <= 0) return;
+            const fuerza = 1000 + Math.random() * 2000;
+            const premioIndex = seleccionarPremioPorFuerza(fuerza);
+            ejecutarGiroFisico(premioIndex, fuerza);
+            
+            tirosRestantes--;
+            ultimoTiroTime = Date.now();
+            actualizarDisplayTiros();
+            guardarEstado();
+        }
     </script>
 </body>
 </html>
