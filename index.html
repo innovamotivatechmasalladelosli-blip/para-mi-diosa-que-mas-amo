@@ -235,46 +235,58 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 159, 181, 0.1) 100%);
+            border-radius: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         }
 
         #ruletaCanvas {
             width: 320px;
             height: 320px;
-            border: 5px solid #FFD700;
+            border: 8px solid #FFD700;
             border-radius: 50%;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
             display: block;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.05) 100%);
+            transform-origin: center;
         }
 
         .ruleta-indicador {
             position: absolute;
-            top: -15px;
+            top: -20px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-bottom: 20px solid #FF4B72;
+            border-top: 25px solid #FFD700;
             z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
         .btn-girar {
-            background-color: #4CAF50;
-            color: white;
+            background-color: #FFD700;
+            color: #5C3A21;
             border: 4px solid white;
             padding: 12px 20px;
             font-size: 1.1rem;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
             margin-top: 20px;
             transition: background-color 0.3s, transform 0.1s;
+            font-weight: bold;
         }
 
         .btn-girar:active {
             transform: scale(0.95);
+        }
+        
+        .btn-girar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         #resultadoRuleta {
@@ -323,7 +335,7 @@
         </div>
 
         <!-- Sección de la Ruleta -->
-        <h2 class="fuente-titulo titulo-vales">🎡 Gira la Ruleta de Bonos 🎡</h2>
+        <h2 class="fuente-titulo titulo-vales" style="color: #FFD700; text-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">🎡 Gira la Ruleta de Bonos 🎡</h2>
         <div class="ruleta-container">
             <canvas id="ruletaCanvas" width="500" height="500"></canvas>
             <div class="ruleta-indicador"></div>
@@ -450,17 +462,17 @@
         canvas.height = 500;
         
         const premios = [
-            { text: 'Nada 😔', weight: 40, color: '#CCCCCC', description: '¡Ups! No hay bono esta vez, pero siempre hay amor.' },
-            { text: 'Dulce 🍬', weight: 20, color: '#FFB347', description: '¡Un dulce para endulzar tu día!' },
-            { text: 'Verdad o Reto 🤔', weight: 15, color: '#87CEEB', description: '¡Es hora de la diversión! ¿Verdad o Reto?' },
-            { text: 'Foto 📸', weight: 10, color: '#FFD700', description: '¡Una foto juntos para el recuerdo!' },
-            { text: 'Abrazo 🤗', weight: 5, color: '#FF9FB5', description: '¡Un cálido abrazo para ti!' },
-            { text: 'Agarrarse la mano 🤝', weight: 5, color: '#90EE90', description: '¡Un paseo tomados de la mano!' },
-            { text: 'Algo Libre ✨', weight: 5, color: '#DDA0DD', description: '¡Pide lo que quieras, mi amor!' },
-            { text: 'Vale por un Beso 💋', weight: 5, color: '#FF69B4', description: '¡Un besote para mi persona favorita!' },
-            { text: 'Cita de Postres 🍰', weight: 10, color: '#F08080', description: '¡Yo invito, tú eliges el lugar para unos ricos postres!' },
-            { text: 'Tarde de Pelis 🎬', weight: 10, color: '#ADD8E6', description: '¡Preparo palomitas y tu manta favorita para una tarde de pelis!' },
-            { text: 'Vale de la Razón 👑', weight: 10, color: '#DAA520', description: '¡Por esta vez, tú tienes la razón en todo! 😉' }
+            { text: 'Nada 😔', weight: 40, color: '#E8D5B7', description: '¡Ups! No hay bono esta vez, pero siempre hay amor.' },
+            { text: 'Dulce 🍬', weight: 20, color: '#FFE4B5', description: '¡Un dulce para endulzar tu día!' },
+            { text: 'Verdad o Reto 🤔', weight: 15, color: '#FFD4E5', description: '¡Es hora de la diversión! ¿Verdad o Reto?' },
+            { text: 'Foto 📸', weight: 10, color: '#FFF8DC', description: '¡Una foto juntos para el recuerdo!' },
+            { text: 'Abrazo 🤗', weight: 5, color: '#FFB6D9', description: '¡Un cálido abrazo para ti!' },
+            { text: 'Agarrarse la mano 🤝', weight: 5, color: '#FFE4C4', description: '¡Un paseo tomados de la mano!' },
+            { text: 'Algo Libre ✨', weight: 5, color: '#FFDAB9', description: '¡Pide lo que quieras, mi amor!' },
+            { text: 'Vale por un Beso 💋', weight: 5, color: '#FFB6C1', description: '¡Un besote para mi persona favorita!' },
+            { text: 'Cita de Postres 🍰', weight: 10, color: '#FFEFD5', description: '¡Yo invito, tú eliges el lugar para unos ricos postres!' },
+            { text: 'Tarde de Pelis 🎬', weight: 10, color: '#FFE4D6', description: '¡Preparo palomitas y tu manta favorita para una tarde de pelis!' },
+            { text: 'Vale de la Razón 👑', weight: 10, color: '#FFECB3', description: '¡Por esta vez, tú tienes la razón en todo! 😉' }
         ];
 
         const totalWeight = premios.reduce((sum, premio) => sum + premio.weight, 0);
@@ -479,8 +491,8 @@
                 ctx.lineTo(250, 250);
                 ctx.fillStyle = premio.color;
                 ctx.fill();
-                ctx.strokeStyle = '#5C3A21'; // Borde para cada segmento
-                ctx.lineWidth = 1; 
+                ctx.strokeStyle = '#FFD700'; // Borde dorado para cada segmento
+                ctx.lineWidth = 2; 
                 ctx.stroke();
 
                 ctx.save();
@@ -489,7 +501,7 @@
                 ctx.rotate(startAngle + premio.weight * arcSize / 2); // Rotar al centro del segmento
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#5C3A21';
-                ctx.font = 'bold 20px Fredoka'; // Reducir tamaño de fuente
+                ctx.font = 'bold 18px Fredoka'; // Tamaño de fuente optimizado
                 
                 // Ajustar posición del texto para que no se salga
                 const text = premio.text;
@@ -567,6 +579,12 @@
                 abrirModalRuleta(selectedPremio.text, selectedPremio.description);
                 btnGirar.disabled = false;
                 isSpinning = false;
+                // Resetear la transformación para el próximo giro
+                ruletaCanvas.style.transition = 'none';
+                ruletaCanvas.style.transform = 'rotate(0deg)';
+                // Forzar reflow para que se aplique el cambio
+                void ruletaCanvas.offsetWidth;
+                ruletaCanvas.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
             }, 4000); // Duración de la animación CSS
         }
 
