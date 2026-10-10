@@ -387,7 +387,7 @@
             font-weight: 600;
         }
 
-        /* Animación de giro físico */
+        /* Giro físico */
         .ruleta-wrapper.girando {
             /* Dejamos que JS controle la transición */
         }
@@ -403,7 +403,7 @@
             animation: desplegar 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
-        /* Animación de recogida */
+        /* Recogida */
         @keyframes recoger {
             0% { transform: scale(1.15) rotate(0deg); }
             100% { transform: scale(0.92) rotate(-10deg); }
@@ -422,6 +422,76 @@
         .ruleta-wrapper.puede-girar #ruletaCanvas {
             animation: pulsarRuleta 2s ease-in-out infinite;
         }
+
+
+        /* Pie de página y avisos legales */
+        .pie-sitio {
+            width: 100%;
+            max-width: 450px;
+            padding: 28px 20px 12px;
+            text-align: center;
+            color: rgba(92, 58, 33, 0.72);
+        }
+
+        .pie-autor {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .pie-enlaces {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 14px;
+        }
+
+        .pie-enlaces button {
+            border: 0;
+            background: transparent;
+            color: #8d5b42;
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.78rem;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .aviso-cookies {
+            position: fixed;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            z-index: 200;
+            max-width: 450px;
+            margin: auto;
+            padding: 18px;
+            border: 1px solid #ead7c5;
+            border-radius: 18px;
+            background: #fffaf0;
+            box-shadow: 0 12px 30px rgba(92, 58, 33, 0.2);
+            color: #5c3a21;
+            text-align: left;
+        }
+
+        .aviso-cookies.oculto { display: none; }
+        .aviso-cookies h2 { font-size: 1.05rem; margin-bottom: 7px; }
+        .aviso-cookies p { font-size: 0.85rem; line-height: 1.45; margin-bottom: 12px; }
+        .aviso-cookies a { color: #8d5b42; }
+        .btn-cookies {
+            border: 0;
+            border-radius: 999px;
+            background: #5c3a21;
+            color: white;
+            cursor: pointer;
+            font: inherit;
+            font-weight: 700;
+            padding: 10px 18px;
+        }
+
+        .modal-legal { max-width: 430px; max-height: 82vh; overflow: auto; text-align: left; }
+        .modal-legal h2 { color: #5c3a21; margin: 0 28px 14px 0; }
+        .modal-legal p { font-size: 0.9rem; line-height: 1.55; margin-bottom: 12px; }
 
     </style>
 </head>
@@ -491,6 +561,17 @@
 
     </div>
 
+
+    <footer class="pie-sitio" aria-label="Información legal">
+        <p class="pie-autor">Uriel Medeles Alvarado</p>
+        <nav class="pie-enlaces" aria-label="Enlaces legales">
+            <button type="button" onclick="abrirLegal('terminos')">Términos y servicios</button>
+            <button type="button" onclick="abrirLegal('copyright')">Derechos de copyright</button>
+            <button type="button" onclick="abrirLegal('cookies')">Política de Cookies</button>
+            <button type="button" onclick="abrirLegal('privacidad')">Aviso de Privacidad</button>
+        </nav>
+    </footer>
+
     <!-- Modal del Mensaje -->
     <div class="modal-overlay" id="modal-mensaje">
         <div class="modal-content modal-mensaje">
@@ -521,7 +602,64 @@
         </div>
     </div>
 
+    <!-- Modales legales -->
+    <div class="modal-overlay" id="modal-legal">
+        <div class="modal-content modal-legal">
+            <button class="btn-cerrar fuente-titulo" onclick="cerrarModal('modal-legal')" aria-label="Cerrar">×</button>
+            <h2 class="fuente-titulo" id="legal-titulo"></h2>
+            <div id="legal-contenido"></div>
+        </div>
+    </div>
+
+    <div class="aviso-cookies" id="aviso-cookies" role="dialog" aria-label="Aviso de Cookies">
+        <h2>Política de Cookies</h2>
+        <p>Usamos almacenamiento local únicamente para recordar tus preferencias y el estado de esta experiencia. Al continuar, aceptas el uso de Cookies descrito en nuestra política.</p>
+        <button class="btn-cookies" type="button" onclick="aceptarCookies()">Aceptar Cookies</button>
+    </div>
+
     <script>
+
+        // ============================================================
+        // 0. Aviso de Cookies y textos legales
+        // ============================================================
+        const textosLegales = {
+            terminos: {
+                titulo: 'Términos y servicios',
+                contenido: '<p>Este sitio ofrece una experiencia personal y recreativa. Al utilizarlo aceptas hacerlo de forma responsable y respetuosa.</p><p>El contenido se proporciona tal como está, sin garantías de disponibilidad permanente. No uses esta experiencia como sustituto de atención profesional de salud mental.</p>'
+            },
+            copyright: {
+                titulo: 'Derechos de copyright',
+                contenido: '<p>© 2026 Uriel Medeles Alvarado. Todos los derechos reservados.</p><p>El diseño, textos y código de este sitio no pueden copiarse, redistribuirse o modificarse para fines públicos o comerciales sin autorización previa.</p>'
+            },
+            cookies: {
+                titulo: 'Política de Cookies',
+                contenido: '<p>Este sitio utiliza almacenamiento local del navegador para recordar la aceptación de Cookies y conservar preferencias de la experiencia. No se utilizan Cookies de publicidad ni se venden datos personales.</p><p>La aceptación se guarda una sola vez en este navegador. Puedes eliminarla borrando los datos del sitio desde la configuración de tu navegador.</p>'
+            },
+            privacidad: {
+                titulo: 'Aviso de Privacidad',
+                contenido: '<p>Este sitio no solicita ni recopila directamente datos personales identificables. La información que introduzcas en la experiencia permanece en tu navegador cuando la funcionalidad lo permite.</p><p>Para ejercer cualquier duda relacionada con privacidad, puedes contactar al responsable del proyecto: Uriel Medeles Alvarado.</p>'
+            }
+        };
+
+        function aceptarCookies() {
+            localStorage.setItem('cookies_aceptadas', 'true');
+            document.getElementById('aviso-cookies').classList.add('oculto');
+        }
+
+        function mostrarAvisoCookies() {
+            if (localStorage.getItem('cookies_aceptadas') === 'true') {
+                document.getElementById('aviso-cookies').classList.add('oculto');
+            }
+        }
+
+        function abrirLegal(tipo) {
+            const legal = textosLegales[tipo];
+            if (!legal) return;
+            document.getElementById('legal-titulo').textContent = legal.titulo;
+            document.getElementById('legal-contenido').innerHTML = legal.contenido;
+            document.getElementById('modal-legal').classList.add('activo');
+        }
+
         // ============================================================
         // 1. Lluvia de Emojis
         // ============================================================
@@ -542,7 +680,10 @@
             }, 700);
         }
         
-        window.onload = iniciarLluvia;
+        window.onload = () => {
+            iniciarLluvia();
+            mostrarAvisoCookies();
+        };
 
         // ============================================================
         // 2. Destellos Pompompurin
@@ -969,7 +1110,7 @@
             
             const rotacionTotal = (giros * 360) + finalRotationOffset;
             
-            // Resetear y aplicar animación
+            // Restablecer y aplicar transición
             ruletaWrapper.classList.remove('anim-desplegar');
             
             // Calculamos desde dónde estamos actualmente (normalizado)
